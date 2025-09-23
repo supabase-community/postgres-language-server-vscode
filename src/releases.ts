@@ -1,4 +1,5 @@
 import { window } from "vscode";
+import semver from "semver";
 import { logger } from "./logger";
 import { getConfig } from "./config";
 import { state } from "./state";
@@ -81,23 +82,26 @@ export class Releases {
     }
 
     const prereleaseEnabled = this.prereleaseEnabled();
+    const filteredReleases = this.releases.filter((r) => prereleaseEnabled || !r.prerelease);
 
-    const idx = this.releases
-      .filter((r) => prereleaseEnabled || !r.prerelease)
-      .findIndex((r) => r.tag_name === tag_name);
-
-    if (idx === -1) {
-      return true;
+    if (filteredReleases.length === 0) {
+      return false;
     }
 
-    if (idx >= 3) {
-      return true;
-    }
+    // Get the latest version (first in the sorted array)
+    const latestVersion = filteredReleases[0].tag_name;
+
+    // Use semantic version comparison to check if current version is outdated
+    // A version is considered outdated if it's less than the latest version
+    return semver.lt(tag_name, latestVersion);
   }
 
   latestVersion(): string | null {
-    if (this.releases.length > 0) {
-      return this.releases[0].tag_name;
+    const prereleaseEnabled = this.prereleaseEnabled();
+    const filteredReleases = this.releases.filter((r) => prereleaseEnabled || !r.prerelease);
+    
+    if (filteredReleases.length > 0) {
+      return filteredReleases[0].tag_name;
     } else {
       return null;
     }
@@ -165,10 +169,15 @@ async function fromGithub(): Promise<Release[]> {
 
   const filteredAndSorted = releases
     .filter((r) => !r.draft)
-    .sort(
-      (a, b) =>
-        new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
-    );
+    .sort((a, b) => {
+      // Sort by semantic version (highest first), then by publication date as fallback
+      const versionComparison = semver.rcompare(a.tag_name, b.tag_name);
+      if (versionComparison !== 0) {
+        return versionComparison;
+      }
+      // If versions are equal, sort by publication date (newest first)
+      return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
+    });
 
   await setCache(filteredAndSorted);
 
