@@ -81,8 +81,7 @@ export class Releases {
       return false;
     }
 
-    const prereleaseEnabled = this.prereleaseEnabled();
-    const filteredReleases = this.releases.filter((r) => prereleaseEnabled || !r.prerelease);
+    const filteredReleases = this.all();
 
     if (filteredReleases.length === 0) {
       return false;
@@ -97,8 +96,7 @@ export class Releases {
   }
 
   latestVersion(): string | null {
-    const prereleaseEnabled = this.prereleaseEnabled();
-    const filteredReleases = this.releases.filter((r) => prereleaseEnabled || !r.prerelease);
+    const filteredReleases = this.all();
     
     if (filteredReleases.length > 0) {
       return filteredReleases[0].tag_name;
