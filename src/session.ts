@@ -87,7 +87,7 @@ export const createSession = async (
     Date.now() - new Date(lastNotifiedOfUpdate).getTime() > daysToMs(3)
   ) {
     window.showInformationMessage(
-      `PostgresTools ${version} is outdated, consider updating to ${state.releases.latestVersion()}.`
+      `A new version of PostgresTools is available! your version ${version} is outdated, consider updating to latest version ${state.releases.latestVersion()}.`
     );
     await state.context.globalState.update(
       "lastNotifiedOfUpdate",
@@ -100,7 +100,7 @@ export const createSession = async (
     !semver.gte(version, "0.8.0")
   ) {
     window.showInformationMessage(
-      `PostgresTools ${version} does not support multi root workspaces. Consider upgrading to >= 0.8.0.`
+      `Your current PostgresTools version ${version} does not support multi-root workspaces. Consider upgrading to version >= 0.8.0.`
     );
   }
 
