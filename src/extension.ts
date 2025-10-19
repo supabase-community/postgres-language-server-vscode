@@ -63,29 +63,6 @@ const registerUserFacingCommands = () => {
     )
   );
 
-  // deprecated
-  state.context.subscriptions.push(
-    commands.registerCommand("postgrestools.start", UserFacingCommands.start),
-    commands.registerCommand("postgrestools.stop", UserFacingCommands.stop),
-    commands.registerCommand(
-      "postgrestools.restart",
-      UserFacingCommands.restart
-    ),
-    commands.registerCommand(
-      "postgrestools.download",
-      UserFacingCommands.download
-    ),
-    commands.registerCommand("postgrestools.reset", UserFacingCommands.reset),
-    commands.registerCommand(
-      "postgrestools.currentVersion",
-      UserFacingCommands.currentVersion
-    ),
-    commands.registerCommand(
-      "postgrestools.copyLatestLogfile",
-      UserFacingCommands.copyLatestLogfile
-    )
-  );
-
   logger.info("User-facing commands registered");
 };
 
