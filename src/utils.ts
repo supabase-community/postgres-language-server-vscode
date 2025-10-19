@@ -105,7 +105,7 @@ export function subtractURI(original: Uri, subtract: Uri): Uri | undefined {
  * This function checks if a file is executable using Node's `accessSync` function.
  * It returns true if the file is executable, otherwise it returns false.
  *
- * This is used to ensure that downloaded PostgresTools binaries are executable.
+ * This is used to ensure that downloaded Postgres Language Server binaries are executable.
  */
 export function fileIsExecutable(uri: Uri): boolean {
   try {
@@ -117,7 +117,7 @@ export function fileIsExecutable(uri: Uri): boolean {
 }
 
 // Retrieve the version of the binary
-// We call postgrestools with --version which outputs the version in the format
+// We call postgres-language-server with --version which outputs the version in the format
 // of "Version: 1.0.0"
 export async function getVersion(bin: Uri): Promise<string | null> {
   if (!(await fileExists(bin))) {

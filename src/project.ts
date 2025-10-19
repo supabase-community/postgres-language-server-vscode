@@ -20,7 +20,7 @@ export async function getActiveProjectsForMultiRoot(
 
     if (globalConfigSetting && globalConfigSetting.startsWith(".")) {
       window.showErrorMessage(
-        "Relative paths to the `postgrestools.jsonc` file in a multi-root workspace are not supported. Please use an absolute path in your `*.code-workspace` file."
+        "Relative paths to the `postgres-language-server.jsonc` or `postgrestools.jsonc` file in a multi-root workspace are not supported. Please use an absolute path in your `*.code-workspace` file."
       );
       return [];
     }
@@ -41,17 +41,31 @@ export async function getActiveProjectsForMultiRoot(
   return await Promise.all(
     folders.map(async (folder) => {
       if (!isEnabledForFolder(folder)) {
+        logger.info(
+          `Postgres Language Server disabled for folder via settings`,
+          {
+            path: folder.uri,
+          }
+        );
+
         return null;
       }
 
       if (!globalConfig) {
-        const defaultConfigPath = Uri.joinPath(
+        const defaultConfigPathNew = Uri.joinPath(
+          folder.uri,
+          "postgres-language-server.jsonc"
+        );
+        const defaultConfigPathOld = Uri.joinPath(
           folder.uri,
           "postgrestools.jsonc"
         );
 
-        const exists = await fileExists(defaultConfigPath);
-        if (!exists) {
+        const hasDefaultConfig =
+          (await fileExists(defaultConfigPathNew)) ||
+          (await fileExists(defaultConfigPathOld));
+
+        if (!hasDefaultConfig) {
           logger.info(
             `Project does not have a config file at default path and is therefore excluded from multi-root workspace.`,
             {
@@ -84,7 +98,15 @@ export async function getActiveProjectForSingleRoot(
     configPath = Uri.joinPath(first.uri, userConfig);
   } else {
     logger.info("User did not specify path to config file. Using default.");
-    configPath = Uri.joinPath(first.uri, "postgrestools.jsonc");
+
+    const newDefault = Uri.joinPath(
+      first.uri,
+      "postgres-language-server.jsonc"
+    );
+
+    const oldDefault = Uri.joinPath(first.uri, "postgrestools.jsonc");
+
+    configPath = (await fileExists(newDefault)) ? newDefault : oldDefault;
   }
 
   if (!(await fileExists(configPath))) {

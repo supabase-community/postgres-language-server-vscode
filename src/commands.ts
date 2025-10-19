@@ -31,7 +31,7 @@ export class UserFacingCommands {
 
   /**
    * When calling this command, the user will be prompted to select a version of
-   * the PostgresTools CLI to install. The selected version will be downloaded and stored
+   * the Postgres Language Server CLI to install. The selected version will be downloaded and stored
    * in VS Code's global storage directory.
    */
   static async download() {
@@ -39,7 +39,7 @@ export class UserFacingCommands {
   }
 
   /**
-   * Stops and restarts the PostgresTools extension, resetting state and cleaning up temporary binaries.
+   * Stops and restarts the Postgres Language Server extension, resetting state and cleaning up temporary binaries.
    */
   static async reset() {
     await stop();
@@ -52,7 +52,7 @@ export class UserFacingCommands {
 
     state.activeSession = undefined;
     state.activeProject = undefined;
-    logger.info("PostgresTools extension was reset");
+    logger.info("Postgres Language Server extension was reset");
 
     await start();
   }
@@ -61,17 +61,21 @@ export class UserFacingCommands {
     const session = state.activeSession;
 
     if (!session) {
-      window.showInformationMessage("No PostgresTools version installed.");
+      window.showInformationMessage(
+        "No Postgres Language Server version installed."
+      );
       return;
     }
 
     const version = await getVersion(session.bin);
 
     if (!version) {
-      window.showInformationMessage("No PostgresTools version installed.");
+      window.showInformationMessage(
+        "No Postgres Language Server version installed."
+      );
     } else {
       window.showInformationMessage(
-        `Currently installed PostgresTools version is ${version}.`
+        `Currently installed Postgres Language Server version is ${version}.`
       );
       window.showInformationMessage(
         `Using binary from "${session.binaryStrategyLabel}".`
@@ -124,7 +128,7 @@ export class UserFacingCommands {
         }
         default: {
           window.showErrorMessage(
-            `Unsupported Platform: ${process.platform}. PostgresTools only runs on linux, darwin and windows.`
+            `Unsupported Platform: ${process.platform}. Postgres Language Server only runs on linux, darwin and windows.`
           );
           return;
         }

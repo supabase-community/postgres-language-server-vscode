@@ -12,7 +12,7 @@ import { debounce } from "./utils";
 import { updateHidden } from "./status-bar";
 
 /**
- * This function is responsible for booting the PostgresTools extension. It is called
+ * This function is responsible for booting the Postgres Language Server extension. It is called
  * when the extension is activated.
  */
 export const createExtension = async () => {
@@ -23,7 +23,7 @@ export const createExtension = async () => {
 };
 
 /**
- * This function is responsible for shutting down the PostgresTools extension. It is
+ * This function is responsible for shutting down the Postgres Language Server extension. It is
  * called when the extension is deactivated and will trigger a cleanup of the
  * extension's state and resources.
  */
@@ -32,6 +32,38 @@ export const destroyExtension = async () => {
 };
 
 const registerUserFacingCommands = () => {
+  state.context.subscriptions.push(
+    commands.registerCommand(
+      "postgres-language-server.start",
+      UserFacingCommands.start
+    ),
+    commands.registerCommand(
+      "postgres-language-server.stop",
+      UserFacingCommands.stop
+    ),
+    commands.registerCommand(
+      "postgres-language-server.restart",
+      UserFacingCommands.restart
+    ),
+    commands.registerCommand(
+      "postgres-language-server.download",
+      UserFacingCommands.download
+    ),
+    commands.registerCommand(
+      "postgres-language-server.reset",
+      UserFacingCommands.reset
+    ),
+    commands.registerCommand(
+      "postgres-language-server.currentVersion",
+      UserFacingCommands.currentVersion
+    ),
+    commands.registerCommand(
+      "postgres-language-server.copyLatestLogfile",
+      UserFacingCommands.copyLatestLogfile
+    )
+  );
+
+  // deprecated
   state.context.subscriptions.push(
     commands.registerCommand("postgrestools.start", UserFacingCommands.start),
     commands.registerCommand("postgrestools.stop", UserFacingCommands.stop),
@@ -58,14 +90,19 @@ const registerUserFacingCommands = () => {
 };
 
 /**
- * This function sets up a listener for configuration changes in the `postgrestools`
- * namespace. When a configuration change is detected, the extension is
+ * This function sets up a listener for configuration changes in the `postgres-language-server`
+ * or `postgrestools` namespace. When a configuration change is detected, the extension is
  * restarted to reflect the new configuration.
  */
 const listenForConfigurationChanges = () => {
   const debouncedConfigurationChangeHandler = debounce(
     (event: ConfigurationChangeEvent) => {
-      if (event.affectsConfiguration("postgrestools")) {
+      if (event.affectsConfiguration("postgres-language-server")) {
+        logger.info("Configuration change detected.");
+        if (!["restarting", "stopping"].includes(state.state)) {
+          restart();
+        }
+      } else if (event.affectsConfiguration("postgrestools")) {
         logger.info("Configuration change detected.");
         if (!["restarting", "stopping"].includes(state.state)) {
           restart();

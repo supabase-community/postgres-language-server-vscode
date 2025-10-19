@@ -7,13 +7,14 @@ export enum OperatingMode {
   MultiRoot = "multi_root",
 }
 
-const npmPackageName = "@postgrestools/postgrestools";
+const newPackageName = "@postgres-language-server/cli";
+const oldPackageName = "@postgrestools/postgrestools";
 
 /**
  * platform and arch are values injected into the node runtime.
  * We use the values documented on https://nodejs.org.
  */
-const PACKAGE_NAMES: Record<string, Record<string, string>> = {
+const OLD_PACKAGE_NAMES: Record<string, Record<string, string>> = {
   win32: {
     x64: `@postgrestools/cli-x86_64-windows-msvc`,
     arm64: `@postgrestools/cli-aarch64-windows-msvc`,
@@ -25,6 +26,20 @@ const PACKAGE_NAMES: Record<string, Record<string, string>> = {
   linux: {
     x64: `@postgrestools/cli-x86_64-linux-gnu`,
     arm64: `@postgrestools/cli-aarch64-linux-gnu`,
+  },
+};
+const NEW_PACKAGE_NAMES: Record<string, Record<string, string>> = {
+  win32: {
+    x64: `@postgres-language-server/cli-x86_64-windows-msvc`,
+    arm64: `@postgres-language-server/cli-aarch64-windows-msvc`,
+  },
+  darwin: {
+    x64: `@postgres-language-server/cli-x86_64-apple-darwin`,
+    arm64: `@postgres-language-server/cli-aarch64-apple-darwin`,
+  },
+  linux: {
+    x64: `@postgres-language-server/cli-x86_64-linux-gnu`,
+    arm64: `@postgres-language-server/cli-aarch64-linux-gnu`,
   },
 };
 
@@ -44,27 +59,62 @@ const _CONSTANTS = {
 
   activationTimestamp: Date.now(),
 
-  platformSpecificBinaryName: (() => {
+  oldPlatformSpecificBinaryName: (() => {
     return `postgrestools${process.platform === "win32" ? ".exe" : ""}`;
+  })(),
+  newPlatformSpecificBinaryName: (() => {
+    return `postgres-language-server${
+      process.platform === "win32" ? ".exe" : ""
+    }`;
   })(),
 
   /**
-   * The name under which PostgresTools is published on npm.
+   * The name under which Postgres Language Server is published on npm.
    */
-  npmPackageName,
+  oldPackageName,
+  newPackageName,
 
-  platformSpecificNodePackageName: (() => {
+  oldPlatformSpecificNodePackageName: (() => {
     const platform: string = process.platform;
     const arch: string = process.arch;
 
-    const pkg = PACKAGE_NAMES[platform]?.[arch];
+    const pkg = OLD_PACKAGE_NAMES[platform]?.[arch];
+
+    // TS won't pick up on the possibility of this being undefined
+    return pkg as string | undefined;
+  })(),
+  newPlatformSpecificNodePackageName: (() => {
+    const platform: string = process.platform;
+    const arch: string = process.arch;
+
+    const pkg = NEW_PACKAGE_NAMES[platform]?.[arch];
 
     // TS won't pick up on the possibility of this being undefined
     return pkg as string | undefined;
   })(),
 
-  platformSpecificReleasedAssetName: (() => {
+  oldPlatformSpecificReleasedAssetName: (() => {
     let assetName = "postgrestools";
+
+    for (const [nodeArch, rustArch] of Object.entries(archMappings)) {
+      if (nodeArch === process.arch) {
+        assetName += `_${rustArch}`;
+      }
+    }
+
+    for (const [nodePlatform, rustPlatform] of Object.entries(
+      platformMappings
+    )) {
+      if (nodePlatform === process.platform) {
+        assetName += `-${rustPlatform}`;
+      }
+    }
+
+    return assetName;
+  })(),
+
+  newPlatformSpecificReleasedAssetName: (() => {
+    let assetName = "postgres-language-server";
 
     for (const [nodeArch, rustArch] of Object.entries(archMappings)) {
       if (nodeArch === process.arch) {

@@ -13,7 +13,7 @@ export interface BinaryFindStrategy {
 }
 
 /**
- * The user can specify a PostgresTools binary in the VSCode settings.
+ * The user can specify a Postgres Language Server binary in the VSCode settings.
  *
  * This can be done in two ways:
  *
@@ -25,17 +25,19 @@ export interface BinaryFindStrategy {
  * Config Example:
  * ```json
  * {
- *   "postgrestools.bin": {
- *   	"linux-x64": "/path/to/postgrestools",
- *    "darwin-arm64": "/path/to/postgrestools",
- *    "win32-x64": "/path/to/postgrestools.exe"
+ *   "postgreslanguageserver.bin": {
+ *   	"linux-x64": "/path/to/bin",
+ *    "darwin-arm64": "/path/to/bin",
+ *    "win32-x64": "/path/to/bin.exe"
  *   }
  * }
  */
 export const vsCodeSettingsStrategy: BinaryFindStrategy = {
   name: "VSCode Settings Strategy",
   async find(path?: Uri) {
-    logger.debug("Trying to find PostgresTools binary via VSCode Settings");
+    logger.debug(
+      "Trying to find Postgres Language Server binary via VSCode Settings"
+    );
 
     type BinSetting = string | Record<string, string> | undefined;
     let binSetting: BinSetting = getConfig("bin", {
@@ -74,7 +76,7 @@ export const vsCodeSettingsStrategy: BinaryFindStrategy = {
       if (binSetting.startsWith(".")) {
         if (CONSTANTS.operatingMode === OperatingMode.MultiRoot) {
           window.showErrorMessage(
-            "Relative paths for the postgrestools binary in a multi-root workspace setting are not supported. Please use an absolute path in your `*.code-workspace` file."
+            "Relative paths for the postgres language server binary in a multi-root workspace setting are not supported. Please use an absolute path in your `*.code-workspace` file."
           );
           return null;
         } else if (path) {
@@ -96,14 +98,16 @@ export const vsCodeSettingsStrategy: BinaryFindStrategy = {
 
       logger.debug("Looking for binary at path", { resolvedPath });
 
-      const postgrestools = Uri.file(resolvedPath);
+      const bin = Uri.file(resolvedPath);
 
-      if (await fileExists(postgrestools)) {
-        return postgrestools;
+      if (await fileExists(bin)) {
+        return bin;
       }
     }
 
-    logger.debug("No PostgresTools binary found in VSCode settings.");
+    logger.debug(
+      "No Postgres Language Server binary found in VSCode settings."
+    );
 
     return null;
   },
@@ -114,84 +118,98 @@ export const vsCodeSettingsStrategy: BinaryFindStrategy = {
  * Search the binary in node modules.
  * Search for the sub-packages that the binary tries to use with npm.
  * Use node's `createRequire` – what's that?
- * Resolve the *main* package.json – the one used by @postgrestools/postgrestools.
+ * Resolve the *main* package.json – the one used by @postgres-language-server/cli or `@postgrestools/postgrestools`.
  * In those node_modules, you should see the installed optional dependency.
  */
 export const nodeModulesStrategy: BinaryFindStrategy = {
   name: "Node Modules Strategy",
   async find(path?: Uri) {
-    logger.debug("Trying to find PostgresTools binary in Node Modules");
+    logger.debug(
+      "Trying to find Postgres Language Server binary in Node Modules"
+    );
 
     if (!path) {
       logger.debug("No local path, skipping.");
       return null;
     }
 
-    const postgrestoolsPackageNameJson = `${CONSTANTS.npmPackageName}/package.json`;
+    for (const [pkgname, nodePkgName, binaryName] of [
+      [
+        CONSTANTS.newPackageName,
+        CONSTANTS.newPlatformSpecificNodePackageName,
+        CONSTANTS.newPlatformSpecificBinaryName,
+      ],
+      [
+        CONSTANTS.oldPackageName,
+        CONSTANTS.oldPlatformSpecificNodePackageName,
+        CONSTANTS.oldPlatformSpecificBinaryName,
+      ],
+    ] satisfies [string, string | undefined, string][]) {
+      const postgresLanguageServerPackageNameJson = `${pkgname}/package.json`;
 
-    logger.info(`Searching for node_modules package`, {
-      postgrestoolsPackageNameJson,
-    });
+      logger.info(`Searching for node_modules package`, {
+        postgresLanguageServerPackageNameJson,
+      });
 
-    let requirePgltPackage: NodeJS.Require;
-    try {
-      /**
-       * Create a scoped require function that can require modules from the
-       * package installed via npm.
-       *
-       * We're essentially searching for the installed package in the current dir, and requiring from its node_modules.
-       * `package.json` serves as a target to resolve the root of the package.
-       */
-      requirePgltPackage = createRequire(
-        require.resolve(postgrestoolsPackageNameJson, {
-          paths: [path.fsPath], // note: global ~/.node_modules is always searched
-        })
-      );
-    } catch (err: unknown) {
-      if (
-        err instanceof Error &&
-        err.message.toLowerCase().includes("cannot find module")
-      ) {
-        logger.debug(`User does not use node_modules`);
-        return null;
-      } else {
-        throw err;
-      }
-    }
-
-    logger.debug("Created require function!");
-
-    const packageName = CONSTANTS.platformSpecificNodePackageName;
-    if (packageName === undefined) {
-      logger.debug(
-        `No package for current platform available in node_modules`,
-        {
-          os: process.platform,
-          arch: process.arch,
+      let requirePgltPackage: NodeJS.Require;
+      try {
+        /**
+         * Create a scoped require function that can require modules from the
+         * package installed via npm.
+         *
+         * We're essentially searching for the installed package in the current dir, and requiring from its node_modules.
+         * `package.json` serves as a target to resolve the root of the package.
+         */
+        requirePgltPackage = createRequire(
+          require.resolve(postgresLanguageServerPackageNameJson, {
+            paths: [path.fsPath], // note: global ~/.node_modules is always searched
+          })
+        );
+      } catch (err: unknown) {
+        if (
+          err instanceof Error &&
+          err.message.toLowerCase().includes("cannot find module")
+        ) {
+          logger.debug(`User does not use node_modules`);
+          return null;
+        } else {
+          throw err;
         }
+      }
+
+      logger.debug("Created require function!");
+
+      if (nodePkgName === undefined) {
+        logger.debug(
+          `No package for current platform available in node_modules`,
+          {
+            os: process.platform,
+            arch: process.arch,
+          }
+        );
+        return null;
+      }
+
+      logger.debug(
+        `Resolving bin package at nested ${nodePkgName}/package.json`
       );
-      return null;
+
+      const binPackage = dirname(
+        requirePgltPackage.resolve(`${nodePkgName}/package.json`)
+      );
+
+      logger.debug(`Resolved binpackage`, { binPackage });
+
+      const binPath = join(binPackage, binaryName);
+      const bin = Uri.file(binPath);
+
+      if (await fileExists(bin)) {
+        return bin;
+      }
+      logger.debug(
+        `Unable to find Postgres Language Server in path ${binPath}`
+      );
     }
-
-    logger.debug(`Resolving bin package at nested ${packageName}/package.json`);
-
-    const binPackage = dirname(
-      requirePgltPackage.resolve(`${packageName}/package.json`)
-    );
-
-    logger.debug(`Resolved binpackage`, { binPackage });
-
-    const postgrestoolsPath = join(
-      binPackage,
-      CONSTANTS.platformSpecificBinaryName
-    );
-    const postgrestools = Uri.file(postgrestoolsPath);
-
-    if (await fileExists(postgrestools)) {
-      return postgrestools;
-    }
-
-    logger.debug(`Unable to find PostgresTools in path ${postgrestoolsPath}`);
 
     return null;
   },
@@ -200,7 +218,9 @@ export const nodeModulesStrategy: BinaryFindStrategy = {
 export const yarnPnpStrategy: BinaryFindStrategy = {
   name: "Yarn PnP Strategy",
   async find(path?: Uri) {
-    logger.debug("Trying to find PostgresTools binary in Yarn Plug'n'Play");
+    logger.debug(
+      "Trying to find Postgres Language Server binary in Yarn Plug'n'Play"
+    );
 
     if (!path) {
       logger.debug("No local path, skipping.");
@@ -225,41 +245,59 @@ export const yarnPnpStrategy: BinaryFindStrategy = {
       const yarnPnpApi = require(pnpFile.fsPath);
 
       /**
-       * Issue a request to the PostgresTools package.json from the current dir.
+       * Issue a request to the Postgres Language Server package.json from the current dir.
        */
-      const postgrestoolsPackage = yarnPnpApi.resolveRequest(
-        `${CONSTANTS.npmPackageName}/package.json`,
-        path.fsPath
-      );
+      for (const [pkgname, nodePkgName, binaryName] of [
+        [
+          CONSTANTS.newPackageName,
+          CONSTANTS.newPlatformSpecificNodePackageName,
+          CONSTANTS.newPlatformSpecificBinaryName,
+        ],
+        [
+          CONSTANTS.oldPackageName,
+          CONSTANTS.oldPlatformSpecificNodePackageName,
+          CONSTANTS.oldPlatformSpecificBinaryName,
+        ],
+      ]) {
+        if (nodePkgName === undefined) {
+          logger.debug(
+            `No node package for current platform available in yarn pnp`,
+            {
+              os: process.platform,
+              arch: process.arch,
+            }
+          );
+          continue;
+        }
 
-      if (!postgrestoolsPackage) {
-        logger.debug(
-          "Unable to find PostgresTools package via Yarn Plug'n'Play API"
-        );
-        continue;
+        // yarn api will throw if we require a pkg that is not listed in package.json
+        try {
+          const packageJson = yarnPnpApi.resolveRequest(
+            `${pkgname}/package.json`,
+            path.fsPath
+          );
+
+          /**
+           * Return URI to the platform-specific binary that the found main package depends on.
+           */
+          return Uri.file(
+            yarnPnpApi.resolveRequest(
+              `${nodePkgName}/${binaryName}`,
+              packageJson
+            )
+          );
+        } catch {
+          logger.debug(
+            `Unable to find package ${pkgname} via Yarn Plug'n'Play API`
+          );
+          continue;
+        }
       }
-
-      const packageName = CONSTANTS.platformSpecificNodePackageName;
-      if (packageName === undefined) {
-        logger.debug(`No package for current platform available in yarn pnp`, {
-          os: process.platform,
-          arch: process.arch,
-        });
-        return null;
-      }
-
-      /**
-       * Return URI to the platform-specific binary that the found main package depends on.
-       */
-      return Uri.file(
-        yarnPnpApi.resolveRequest(
-          `${packageName}/${CONSTANTS.platformSpecificBinaryName}`,
-          postgrestoolsPackage
-        )
-      );
     }
 
-    logger.debug("Couldn't find PostgresTools binary via Yarn Plug'n'Play");
+    logger.debug(
+      "Couldn't find Postgres Language Server binary via Yarn Plug'n'Play"
+    );
 
     return null;
   },
@@ -270,7 +308,9 @@ export const pathEnvironmentVariableStrategy: BinaryFindStrategy = {
   async find() {
     const pathEnv = process.env.PATH;
 
-    logger.debug("Trying to find PostgresTools binary in PATH env var");
+    logger.debug(
+      "Trying to find Postgres Language Server binary in PATH env var"
+    );
 
     if (!pathEnv) {
       logger.debug("Path env var not found");
@@ -280,13 +320,15 @@ export const pathEnvironmentVariableStrategy: BinaryFindStrategy = {
     for (const dir of pathEnv.split(delimiter)) {
       logger.debug(`Checking ${dir}`);
 
-      const postgrestools = Uri.joinPath(
-        Uri.file(dir),
-        CONSTANTS.platformSpecificBinaryName
-      );
+      for (const bname of [
+        CONSTANTS.newPlatformSpecificBinaryName,
+        CONSTANTS.oldPlatformSpecificBinaryName,
+      ]) {
+        const bin = Uri.joinPath(Uri.file(dir), bname);
 
-      if (await fileExists(postgrestools)) {
-        return postgrestools;
+        if (await fileExists(bin)) {
+          return bin;
+        }
       }
     }
 
@@ -297,9 +339,9 @@ export const pathEnvironmentVariableStrategy: BinaryFindStrategy = {
 };
 
 export const downloadPgltStrategy: BinaryFindStrategy = {
-  name: "Download PostgresTools Strategy",
+  name: "Download Postgres Language Server Strategy",
   async find() {
-    logger.debug(`Trying to find downloaded PostgresTools binary`);
+    logger.debug(`Trying to find downloaded Postgres Language Server binary`);
 
     const downloadedBinary = await getDownloadedBinary();
 
@@ -313,7 +355,7 @@ export const downloadPgltStrategy: BinaryFindStrategy = {
 
     const proceed =
       (await window.showInformationMessage(
-        "You've opened a supported file outside of a PostgresTools project, and no installed PostgresTools binary could be found on your system. Would you like to download and install PostgresTools?",
+        "You've opened a supported file outside of a Postgres Language Server project, and no installed Postgres Language Server binary could be found on your system. Would you like to download and install Postgres Language Server?",
         "Download and install",
         "No"
       )) === "Download and install";

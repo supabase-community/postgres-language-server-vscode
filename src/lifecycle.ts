@@ -4,23 +4,23 @@ import { createActiveSession, destroySession } from "./session";
 import { state } from "./state";
 
 /**
- * Starts the PostgresTools extension
+ * Starts the Postgres Language Server extension
  */
 export const start = async () => {
   state.state = "starting";
   await doStart();
   state.state = "started";
-  logger.info("PostgresTools extension started");
+  logger.info("Postgres Language Server extension started");
 };
 
 /**
- * Stops the PostgresTools extension
+ * Stops the Postgres Language Server extension
  */
 export const stop = async () => {
   state.state = "stopping";
   await doStop();
   state.state = "stopped";
-  logger.info("PostgresTools extension stopped");
+  logger.info("Postgres Language Server extension stopped");
 };
 
 export const restart = async () => {
@@ -33,7 +33,7 @@ export const restart = async () => {
   await doStop();
   await doStart();
   state.state = "started";
-  logger.info("PostgresTools extension restarted");
+  logger.info("Postgres Language Server extension restarted");
 };
 
 const doStart = async () => {
@@ -44,7 +44,9 @@ const doStart = async () => {
     if (e instanceof Error) {
       logger.error(e.message);
     }
-    logger.error("Failed to start PostgresTools extension", { error: e });
+    logger.error("Failed to start Postgres Language Server extension", {
+      error: e,
+    });
     state.state = "error";
   }
 };

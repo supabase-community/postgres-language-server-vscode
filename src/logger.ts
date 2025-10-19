@@ -4,7 +4,7 @@ import { CONSTANTS } from "./constants";
 type LogArguments = Record<string, unknown>;
 
 /**
- * Messages logged to this logger will be displayed in the `PostgresTools` output
+ * Messages logged to this logger will be displayed in the `Postgres Language Server` output
  * channel in the Output panel. This logger respects the user's settings for
  * logging verbosity, so only messages with the appropriate log level will be
  * displayed.
@@ -24,7 +24,12 @@ class Logger {
   ) {
     if (args) {
       message += `\n\t${Object.entries(args)
-        .map(([key, value]) => `${key}=${JSON.stringify(value)}`)
+        .map(
+          ([key, value]) =>
+            `${key}=${
+              value instanceof Error ? value.message : JSON.stringify(value)
+            }`
+        )
         .join("\n\t")}`;
     }
 

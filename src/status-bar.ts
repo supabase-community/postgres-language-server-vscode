@@ -13,7 +13,7 @@ export type StatusBar = {
 
 const createStatusBar = (): StatusBar => {
   const item = window.createStatusBarItem(
-    "postgrestools_vscode",
+    "postgres-language-server_vscode",
     StatusBarAlignment.Right,
     1
   );
@@ -58,7 +58,7 @@ const getLspVersion = () => {
 };
 
 const getStateText = (): string => {
-  return "PostgresTools";
+  return "Postgres Language Server";
 };
 
 const getStateTooltip = (): string => {

@@ -11,22 +11,36 @@ import { logger } from "./logger";
 
 type Strategy = {
   label: string;
+  kind: StrategyKind;
   strategy: BinaryFindStrategy;
   onSuccess: (u: Uri) => void;
   condition?: (path?: Uri) => Promise<boolean>;
 };
 
+export enum StrategyKind {
+  NPM,
+  Yarn,
+  VsCodeSettings,
+  Path,
+  Download,
+}
+
 const LOCAL_STRATEGIES: Strategy[] = [
   {
     label: "VSCode Settings",
+    kind: StrategyKind.VsCodeSettings,
     strategy: vsCodeSettingsStrategy,
     onSuccess: (uri) =>
-      logger.debug(`Found Binary in VSCode Settings (postgrestools.bin)`, {
-        path: uri.fsPath,
-      }),
+      logger.debug(
+        `Found Binary in VSCode Settings (postgres-language-server.bin) or (postgrestools.bin)`,
+        {
+          path: uri.fsPath,
+        }
+      ),
   },
   {
     label: "NPM node_modules",
+    kind: StrategyKind.NPM,
     strategy: nodeModulesStrategy,
     onSuccess: (uri) =>
       logger.debug(`Found Binary in Node Modules`, {
@@ -35,6 +49,7 @@ const LOCAL_STRATEGIES: Strategy[] = [
   },
   {
     label: "Yarn Plug'n'Play node_modules",
+    kind: StrategyKind.Yarn,
     strategy: yarnPnpStrategy,
     onSuccess: (uri) =>
       logger.debug(`Found Binary in Yarn PnP`, {
@@ -43,6 +58,7 @@ const LOCAL_STRATEGIES: Strategy[] = [
   },
   {
     label: "PATH Environment Variable",
+    kind: StrategyKind.Path,
     strategy: pathEnvironmentVariableStrategy,
     onSuccess: (uri) =>
       logger.debug(`Found Binary in PATH Environment Variable`, {
@@ -51,6 +67,7 @@ const LOCAL_STRATEGIES: Strategy[] = [
   },
   {
     label: "Downloaded Binary",
+    kind: StrategyKind.Download,
     strategy: downloadPgltStrategy,
     onSuccess: (uri) =>
       logger.debug(`Found downloaded binary`, {
@@ -61,14 +78,16 @@ const LOCAL_STRATEGIES: Strategy[] = [
 const GLOBAL_STRATEGIES: Strategy[] = [
   {
     label: "VSCode Settings",
+    kind: StrategyKind.VsCodeSettings,
     strategy: vsCodeSettingsStrategy,
     onSuccess: (uri) =>
-      logger.debug(`Found Binary in VSCode Settings (postgrestools.bin)`, {
+      logger.debug(`Found Binary in VSCode Settings`, {
         path: uri.fsPath,
       }),
   },
   {
     label: "PATH Environment Variable",
+    kind: StrategyKind.Path,
     strategy: pathEnvironmentVariableStrategy,
     onSuccess: (uri) =>
       logger.debug(`Found Binary in PATH Environment Variable`, {
@@ -77,6 +96,7 @@ const GLOBAL_STRATEGIES: Strategy[] = [
   },
   {
     label: "Downloaded Binary",
+    kind: StrategyKind.Download,
     strategy: downloadPgltStrategy,
     onSuccess: (uri) =>
       logger.debug(`Found downloaded binary`, {
@@ -109,7 +129,7 @@ export class BinaryFinder {
   }
 
   private static async attemptFind(strategies: Strategy[], path?: Uri) {
-    for (const { strategy, onSuccess, condition, label } of strategies) {
+    for (const { strategy, onSuccess, condition, label, kind } of strategies) {
       if (condition && !(await condition(path))) {
         continue;
       }
@@ -118,7 +138,7 @@ export class BinaryFinder {
         const binary = await strategy.find(path);
         if (binary) {
           onSuccess(binary);
-          return { bin: binary, label };
+          return { bin: binary, label, kind };
         } else {
           logger.info(`Binary not found with strategy`, {
             strategy: strategy.name,
