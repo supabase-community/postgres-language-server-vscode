@@ -8,7 +8,7 @@ import { logger } from "./logger";
 
 /**
  * This function retrieves a setting from the workspace configuration.
- * Settings are looked up first under the "postgreslanguageserver", then under the "postgrestools" prefix.
+ * Settings are looked up first under the "postgres-language-server", then under the "postgrestools" prefix.
  *
  * @param key The key of the setting to retrieve
  */
