@@ -43,8 +43,8 @@ async function downloadPgltVersion(version: string): Promise<void> {
   );
 
   const url = newNameAvailable
-    ? `https://github.com/supabase-community/postgres_lsp/releases/download/${version}/${CONSTANTS.newPlatformSpecificReleasedAssetName}`
-    : `https://github.com/supabase-community/postgres_lsp/releases/download/${version}/${CONSTANTS.oldPlatformSpecificReleasedAssetName}`;
+    ? `https://github.com/supabase-community/postgres-language-server/releases/download/${version}/${CONSTANTS.newPlatformSpecificReleasedAssetName}`
+    : `https://github.com/supabase-community/postgres-language-server/releases/download/${version}/${CONSTANTS.oldPlatformSpecificReleasedAssetName}`;
 
   logger.debug(`Attempting to download binary asset from Github`, { url });
 
