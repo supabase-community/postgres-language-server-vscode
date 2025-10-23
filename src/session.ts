@@ -24,13 +24,7 @@ import { state } from "./state";
 import { daysToMs, fileExists, fileIsExecutable, getVersion } from "./utils";
 import { CONSTANTS, OperatingMode } from "./constants";
 import { getConfig, isEnabledForFolder } from "./config";
-import {
-  EARLIEST_CROSS_PUBLISHING_RELEASE,
-  LATEST_CROSS_PUBLISHING_RELEASE,
-  renamingMessageForKind,
-  shouldInformRename,
-  updateAndRenamingMessageForKind,
-} from "./renaming";
+import { hasNewName, updateAndRenamingMessageForKind } from "./renaming";
 
 export type Session = {
   bin: Uri;
@@ -79,20 +73,12 @@ export const createSession = async (
     new Date(0).toISOString();
 
   if (Date.now() - new Date(lastNotifiedOfUpdate).getTime() > daysToMs(3)) {
-    const latestVersion = state.releases.latestVersion() ?? "0.0.0";
-
     if (state.releases.versionOutdated(version)) {
-      if (shouldInformRename(version, latestVersion)) {
-        window.showInformationMessage(
-          updateAndRenamingMessageForKind(findResult.kind)
-        );
-      } else {
-        window.showInformationMessage(
-          `A new version of Postgres Language Server is available! Your version ${version} is outdated, consider updating to latest version ${state.releases.latestVersion()}.`
-        );
-      }
-    } else if (shouldInformRename(version, latestVersion)) {
-      window.showInformationMessage(renamingMessageForKind(findResult.kind));
+      window.showInformationMessage(
+        (await hasNewName())
+          ? updateAndRenamingMessageForKind(findResult.kind)
+          : `A new version of Postgres Language Server is available! Your version ${version} is outdated, consider updating to latest version ${state.releases.latestVersion()}.`
+      );
     }
 
     await state.context.globalState.update(

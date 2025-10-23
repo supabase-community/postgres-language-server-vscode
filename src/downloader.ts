@@ -11,7 +11,7 @@ import { state } from "./state";
 import { CONSTANTS } from "./constants";
 import { fileExists, getVersion } from "./utils";
 import { chmodSync } from "fs";
-import { EARLIEST_CROSS_PUBLISHING_RELEASE } from "./renaming";
+import { hasNewName } from "./renaming";
 
 export async function downloadPglt(): Promise<Uri | null> {
   logger.debug(`Downloading Postgres Language Server`);
@@ -37,10 +37,7 @@ export async function downloadPglt(): Promise<Uri | null> {
 }
 
 async function downloadPgltVersion(version: string): Promise<void> {
-  const newNameAvailable = semver.gte(
-    version,
-    EARLIEST_CROSS_PUBLISHING_RELEASE
-  );
+  const newNameAvailable = await hasNewName();
 
   const url = newNameAvailable
     ? `https://github.com/supabase-community/postgres-language-server/releases/download/${version}/${CONSTANTS.newPlatformSpecificReleasedAssetName}`
