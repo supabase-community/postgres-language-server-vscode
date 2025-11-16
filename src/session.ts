@@ -75,9 +75,7 @@ export const createSession = async (
   if (Date.now() - new Date(lastNotifiedOfUpdate).getTime() > daysToMs(3)) {
     if (state.releases.versionOutdated(version)) {
       window.showInformationMessage(
-        (await hasNewName())
-          ? updateAndRenamingMessageForKind(findResult.kind)
-          : `A new version of Postgres Language Server is available! Your version ${version} is outdated, consider updating to latest version ${state.releases.latestVersion()}.`
+        updateAndRenamingMessageForKind(findResult.kind)
       );
     }
 
@@ -152,7 +150,7 @@ const copyBinaryToTemporaryLocation = async (
 
   const location = Uri.joinPath(
     state.context.globalStorageUri,
-    "tmp-bin",
+    CONSTANTS.globalStorageFolderTmp,
     CONSTANTS.newPlatformSpecificBinaryName.replace(
       "postgres-language-server",
       `postgres-language-server-${version}`

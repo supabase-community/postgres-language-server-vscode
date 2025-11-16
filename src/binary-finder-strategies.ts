@@ -170,8 +170,8 @@ export const nodeModulesStrategy: BinaryFindStrategy = {
           err instanceof Error &&
           err.message.toLowerCase().includes("cannot find module")
         ) {
-          logger.debug(`User does not use node_modules`);
-          return null;
+          logger.debug(`User does not have the package installed`);
+          continue;
         } else {
           throw err;
         }

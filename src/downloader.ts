@@ -37,7 +37,7 @@ export async function downloadPglt(): Promise<Uri | null> {
 }
 
 async function downloadPgltVersion(version: string): Promise<void> {
-  const newNameAvailable = await hasNewName();
+  const newNameAvailable = await hasNewName(version);
 
   const url = newNameAvailable
     ? `https://github.com/supabase-community/postgres-language-server/releases/download/${version}/${CONSTANTS.newPlatformSpecificReleasedAssetName}`

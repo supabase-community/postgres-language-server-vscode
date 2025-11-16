@@ -18,8 +18,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const config = getFullConfig();
 
-  logger.info(`Default of a boolean is ${getConfig("testDefault")}`);
-
   logger.info(`Starting with config…`, { config });
   logger.info(`In mode…`, { mode: CONSTANTS.operatingMode });
 

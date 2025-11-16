@@ -2,10 +2,10 @@ import semver from "semver";
 import { StrategyKind } from "./binary-finder";
 import { CONSTANTS } from "./constants";
 
-export async function hasNewName() {
+export async function hasNewName(version: string) {
   try {
     const response = await fetch(
-      `https://github.com/supabase-community/postgres-language-server/releases/latest/download/${CONSTANTS.newPlatformSpecificReleasedAssetName}`,
+      `https://github.com/supabase-community/postgres-language-server/releases/download/${version}/${CONSTANTS.newPlatformSpecificReleasedAssetName}`,
       {
         method: "HEAD",
       }
