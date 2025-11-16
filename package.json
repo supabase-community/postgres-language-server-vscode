@@ -1,11 +1,12 @@
 {
   "name": "postgrestools",
   "publisher": "Supabase",
+  "displayName": "Postgres Language Server",
   "description": "Postgres Language Server right in your IDE.",
   "version": "1.3.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/supabase-community/postgrestools-vscode"
+    "url": "https://github.com/supabase-community/postgres-language-server-vscode"
   },
   "bugs": {
     "url": "https://github.com/supabase-community/postgres-language-server"
@@ -21,7 +22,9 @@
     "Formatters"
   ],
   "keywords": [
-    "postgrestools",
+    "postgres-language-server",
+    "language server",
+    "language-server",
     "lsp",
     "postgres",
     "supabase"
@@ -33,40 +36,41 @@
   "contributes": {
     "commands": [
       {
-        "title": "PostgresTools: Start",
-        "command": "postgrestools.start"
+        "title": "Postgres Language Server: Start",
+        "command": "postgres-language-server.start"
       },
       {
-        "title": "PostgresTools: Stop",
-        "command": "postgrestools.stop"
+        "title": "Postgres Language Server: Stop",
+        "command": "postgres-language-server.stop"
       },
       {
-        "title": "PostgresTools: Restart",
-        "command": "postgrestools.restart"
+        "title": "Postgres Language Server: Restart",
+        "command": "postgres-language-server.restart"
       },
       {
-        "title": "PostgresTools: Download Server",
-        "command": "postgrestools.download"
+        "title": "Postgres Language Server: Download Server",
+        "command": "postgres-language-server.download"
       },
       {
-        "title": "PostgresTools: Hard Reset (Delete All Temp & Global Binaries)",
-        "command": "postgrestools.reset"
+        "title": "Postgres Language Server: Hard Reset (Delete All Temp & Global Binaries)",
+        "command": "postgres-language-server.reset"
       },
       {
-        "title": "PostgresTools: Get Current Version",
-        "command": "postgrestools.currentVersion"
+        "title": "Postgres Language Server: Get Current Version",
+        "command": "postgres-language-server.currentVersion"
       },
       {
-        "title": "PostgresTools: Copy Latest Server Logfile",
-        "command": "postgrestools.copyLatestLogfile"
+        "title": "Postgres Language Server: Copy Latest Server Logfile",
+        "command": "postgres-language-server.copyLatestLogfile"
       }
     ],
     "configuration": {
-      "title": "PostgresTools",
+      "title": "Postgres Language Server",
       "properties": {
         "postgrestools.enabled": {
           "type": "boolean",
           "description": "Whether to enable the PostgresTools extension.",
+          "deprecationMessage": "`postgrestools` has been renamed to `postgres-language-server`.",
           "default": true,
           "scope": "resource"
         },
@@ -74,17 +78,20 @@
           "type": "boolean",
           "description": "Allows selecting prereleases when downloading the binary via this extension",
           "default": false,
+          "deprecationMessage": "`postgrestools` has been renamed to `postgres-language-server`.",
           "scope": "resource"
         },
         "postgrestools.allowVersionChecks": {
           "type": "boolean",
           "description": "If set, the extension will check periodically whether a new version for PostgresTools is available and if so notify the user.",
           "default": true,
+          "deprecationMessage": "`postgrestools` has been renamed to `postgres-language-server`.",
           "scope": "resource"
         },
         "postgrestools.configFile": {
           "type": "string",
           "description": "Path to the `postgrestools.jsonc` file. You don't need to set this if the file is on root level of your project.",
+          "deprecationMessage": "`postgrestools` has been renamed to `postgres-language-server`.",
           "scope": "resource"
         },
         "postgrestools.bin": {
@@ -105,6 +112,51 @@
                   "linux-x64": "/path/to/postgrestools",
                   "darwin-arm64": "./path/to/postgrestools",
                   "win32-x64": "/path/to/postgrestools.exe"
+                }
+              ]
+            }
+          ],
+          "deprecationMessage": "`postgrestools` has been renamed to `postgres-language-server`.",
+          "scope": "resource"
+        },
+        "postgres-language-server.enabled": {
+          "type": "boolean",
+          "description": "Whether to enable the postgres-language-server extension.",
+          "scope": "resource"
+        },
+        "postgres-language-server.allowDownloadPrereleases": {
+          "type": "boolean",
+          "description": "Allows selecting prereleases when downloading the binary via this extension",
+          "scope": "resource"
+        },
+        "postgres-language-server.allowVersionChecks": {
+          "type": "boolean",
+          "description": "If set, the extension will check periodically whether a new version for postgres-language-server is available and if so notify the user.",
+          "scope": "resource"
+        },
+        "postgres-language-server.configFile": {
+          "type": "string",
+          "description": "Path to the `postgres-language-server.jsonc` file. You don't need to set this if the file is on root level of your project.",
+          "scope": "resource"
+        },
+        "postgres-language-server.bin": {
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Path to the postgres-language-server Language Server binary",
+              "examples": [
+                "/path/to/postgres-language-server",
+                "./path/to/postgres-language-server"
+              ]
+            },
+            {
+              "type": "object",
+              "description": "Platform-specific paths to the postgres-language-server Language Server binary",
+              "examples": [
+                {
+                  "linux-x64": "/path/to/postgres-language-server",
+                  "darwin-arm64": "./path/to/postgres-language-server",
+                  "win32-x64": "/path/to/postgres-language-server.exe"
                 }
               ]
             }

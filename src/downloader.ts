@@ -1,3 +1,4 @@
+import * as semver from "semver";
 import {
   ProgressLocation,
   QuickPickItem,
@@ -10,9 +11,10 @@ import { state } from "./state";
 import { CONSTANTS } from "./constants";
 import { fileExists, getVersion } from "./utils";
 import { chmodSync } from "fs";
+import { hasNewName } from "./renaming";
 
 export async function downloadPglt(): Promise<Uri | null> {
-  logger.debug(`Downloading PostgresTools`);
+  logger.debug(`Downloading Postgres Language Server`);
 
   const versionToDownload = await promptVersionToDownload();
 
@@ -23,7 +25,7 @@ export async function downloadPglt(): Promise<Uri | null> {
 
   await window.withProgress(
     {
-      title: `Downloading PostgresTools ${versionToDownload.label}`,
+      title: `Downloading Postgres Language Server ${versionToDownload.label}`,
       location: ProgressLocation.Notification,
     },
     () => downloadPgltVersion(versionToDownload.label)
@@ -35,7 +37,11 @@ export async function downloadPglt(): Promise<Uri | null> {
 }
 
 async function downloadPgltVersion(version: string): Promise<void> {
-  const url = `https://github.com/supabase-community/postgres_lsp/releases/download/${version}/${CONSTANTS.platformSpecificReleasedAssetName}`;
+  const newNameAvailable = await hasNewName(version);
+
+  const url = newNameAvailable
+    ? `https://github.com/supabase-community/postgres-language-server/releases/download/${version}/${CONSTANTS.newPlatformSpecificReleasedAssetName}`
+    : `https://github.com/supabase-community/postgres-language-server/releases/download/${version}/${CONSTANTS.oldPlatformSpecificReleasedAssetName}`;
 
   logger.debug(`Attempting to download binary asset from Github`, { url });
 
@@ -57,12 +63,14 @@ async function downloadPgltVersion(version: string): Promise<void> {
     return;
   }
 
-  const binPath = getInstalledBinaryPath();
+  const binPath = newNameAvailable
+    ? getNewInstalledBinaryPath()
+    : getOldInstalledBinaryPath();
 
   try {
     await workspace.fs.writeFile(binPath, new Uint8Array(binary));
     chmodSync(binPath.fsPath, 0o755);
-    const successMsg = `Downloaded PostgresTools ${version} to ${binPath.fsPath}`;
+    const successMsg = `Downloaded Postgres Language Server ${version} to ${binPath.fsPath}`;
     logger.info(successMsg);
     window.showInformationMessage(successMsg);
   } catch (error) {
@@ -78,34 +86,37 @@ export async function getDownloadedBinary(): Promise<{
 } | null> {
   logger.debug(`Getting downloaded version`);
 
-  const bin = getInstalledBinaryPath();
+  for (const bin of [
+    getNewInstalledBinaryPath(),
+    getOldInstalledBinaryPath(),
+  ]) {
+    if (await fileExists(bin)) {
+      const version = await getVersion(bin);
+      if (!version) {
+        throw new Error("Just verified file exists, but it doesn't anymore.");
+      }
 
-  if (await fileExists(bin)) {
-    const version = await getVersion(bin);
-    if (!version) {
-      throw new Error("Just verified file exists, but it doesn't anymore.");
+      logger.debug(`Found downloaded version and binary`, {
+        path: bin.fsPath,
+        version,
+      });
+
+      return {
+        binPath: bin,
+        version,
+      };
+    } else {
+      logger.info(`Downloaded binary does not exist:`, { binPath: bin });
     }
-
-    logger.debug(`Found downloaded version and binary`, {
-      path: bin.fsPath,
-      version,
-    });
-
-    return {
-      binPath: bin,
-      version,
-    };
   }
-
-  logger.info(`Downloaded binary does not exist.`, {
-    binPath: bin,
-  });
 
   return null;
 }
 
 async function promptVersionToDownload() {
-  logger.debug(`Prompting user to select PostgresTools version to download`);
+  logger.debug(
+    `Prompting user to select Postgres Language Server version to download`
+  );
 
   const itemsPromise: Promise<QuickPickItem[]> = new Promise(
     async (resolve) => {
@@ -146,15 +157,23 @@ async function promptVersionToDownload() {
   );
 
   return window.showQuickPick(itemsPromise, {
-    title: "Select PostgresTools version to download",
-    placeHolder: "Select PostgresTools version to download",
+    title: "Select Postgres Language Server version to download",
+    placeHolder: "Select Postgres Language Server version to download",
   });
 }
 
-function getInstalledBinaryPath() {
+function getOldInstalledBinaryPath() {
   return Uri.joinPath(
     state.context.globalStorageUri,
     CONSTANTS.globalStorageFolderForBinary,
-    CONSTANTS.platformSpecificBinaryName
+    CONSTANTS.oldPlatformSpecificBinaryName
+  );
+}
+
+function getNewInstalledBinaryPath() {
+  return Uri.joinPath(
+    state.context.globalStorageUri,
+    CONSTANTS.globalStorageFolderForBinary,
+    CONSTANTS.newPlatformSpecificBinaryName
   );
 }

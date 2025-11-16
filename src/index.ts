@@ -12,7 +12,7 @@ import { CONSTANTS } from "./constants";
 export async function activate(context: vscode.ExtensionContext) {
   logger.clear();
   logger.info(
-    `PostgresTools extension ${context.extension.packageJSON.version} activated`
+    `Postgres Language Server extension ${context.extension.packageJSON.version} activated`
   );
   state.context = context;
 

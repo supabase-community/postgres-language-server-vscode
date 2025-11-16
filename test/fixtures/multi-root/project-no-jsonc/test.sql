@@ -1,1 +1,1 @@
-select * from auth.users;
+select emai from auth.users;

@@ -1,1 +1,1 @@
-select aud from auth.users;
+select au from auth.users;

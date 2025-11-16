@@ -1,1 +1,1 @@
-select name from public.users;
+select nam from public.users;

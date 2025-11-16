@@ -27,76 +27,86 @@ const RAW_RUNTIME_STATE =
       [null, {\
         "packageLocation": "./",\
         "packageDependencies": [\
-          ["@postgrestools/postgrestools", "npm:0.2.0"]\
+          ["@postgres-language-server/cli", "npm:0.17.2"]\
         ],\
         "linkType": "SOFT"\
       }]\
     ]],\
-    ["@postgrestools/cli-aarch64-apple-darwin", [\
-      ["npm:0.2.0", {\
-        "packageLocation": "./.yarn/unplugged/@postgrestools-cli-aarch64-apple-darwin-npm-0.2.0-b6f1a531cf/node_modules/@postgrestools/cli-aarch64-apple-darwin/",\
+    ["@postgres-language-server/cli", [\
+      ["npm:0.17.2", {\
+        "packageLocation": "../../../../../.yarn/berry/cache/@postgres-language-server-cli-npm-0.17.2-d04079e1e8-10c0.zip/node_modules/@postgres-language-server/cli/",\
         "packageDependencies": [\
-          ["@postgrestools/cli-aarch64-apple-darwin", "npm:0.2.0"]\
+          ["@postgres-language-server/cli", "npm:0.17.2"],\
+          ["@postgres-language-server/cli-aarch64-apple-darwin", "npm:0.17.2"],\
+          ["@postgres-language-server/cli-aarch64-linux-gnu", "npm:0.17.2"],\
+          ["@postgres-language-server/cli-aarch64-windows-msvc", "npm:0.17.2"],\
+          ["@postgres-language-server/cli-x86_64-apple-darwin", "npm:0.17.2"],\
+          ["@postgres-language-server/cli-x86_64-linux-gnu", "npm:0.17.2"],\
+          ["@postgres-language-server/cli-x86_64-linux-musl", "npm:0.17.2"],\
+          ["@postgres-language-server/cli-x86_64-windows-msvc", "npm:0.17.2"]\
         ],\
         "linkType": "HARD"\
       }]\
     ]],\
-    ["@postgrestools/cli-aarch64-linux-gnu", [\
-      ["npm:0.2.0", {\
-        "packageLocation": "./.yarn/unplugged/@postgrestools-cli-aarch64-linux-gnu-npm-0.2.0-a6136ea9e0/node_modules/@postgrestools/cli-aarch64-linux-gnu/",\
+    ["@postgres-language-server/cli-aarch64-apple-darwin", [\
+      ["npm:0.17.2", {\
+        "packageLocation": "./.yarn/unplugged/@postgres-language-server-cli-aarch64-apple-darwin-npm-0.17.2-4e3e18ca63/node_modules/@postgres-language-server/cli-aarch64-apple-darwin/",\
         "packageDependencies": [\
-          ["@postgrestools/cli-aarch64-linux-gnu", "npm:0.2.0"]\
+          ["@postgres-language-server/cli-aarch64-apple-darwin", "npm:0.17.2"]\
         ],\
         "linkType": "HARD"\
       }]\
     ]],\
-    ["@postgrestools/cli-aarch64-windows-msvc", [\
-      ["npm:0.2.0", {\
-        "packageLocation": "./.yarn/unplugged/@postgrestools-cli-aarch64-windows-msvc-npm-0.2.0-9052e71caf/node_modules/@postgrestools/cli-aarch64-windows-msvc/",\
+    ["@postgres-language-server/cli-aarch64-linux-gnu", [\
+      ["npm:0.17.2", {\
+        "packageLocation": "./.yarn/unplugged/@postgres-language-server-cli-aarch64-linux-gnu-npm-0.17.2-afc0e5dcc7/node_modules/@postgres-language-server/cli-aarch64-linux-gnu/",\
         "packageDependencies": [\
-          ["@postgrestools/cli-aarch64-windows-msvc", "npm:0.2.0"]\
+          ["@postgres-language-server/cli-aarch64-linux-gnu", "npm:0.17.2"]\
         ],\
         "linkType": "HARD"\
       }]\
     ]],\
-    ["@postgrestools/cli-x86_64-apple-darwin", [\
-      ["npm:0.2.0", {\
-        "packageLocation": "./.yarn/unplugged/@postgrestools-cli-x86_64-apple-darwin-npm-0.2.0-0d842c9510/node_modules/@postgrestools/cli-x86_64-apple-darwin/",\
+    ["@postgres-language-server/cli-aarch64-windows-msvc", [\
+      ["npm:0.17.2", {\
+        "packageLocation": "./.yarn/unplugged/@postgres-language-server-cli-aarch64-windows-msvc-npm-0.17.2-0ebdcda685/node_modules/@postgres-language-server/cli-aarch64-windows-msvc/",\
         "packageDependencies": [\
-          ["@postgrestools/cli-x86_64-apple-darwin", "npm:0.2.0"]\
+          ["@postgres-language-server/cli-aarch64-windows-msvc", "npm:0.17.2"]\
         ],\
         "linkType": "HARD"\
       }]\
     ]],\
-    ["@postgrestools/cli-x86_64-linux-gnu", [\
-      ["npm:0.2.0", {\
-        "packageLocation": "./.yarn/unplugged/@postgrestools-cli-x86_64-linux-gnu-npm-0.2.0-7df6e29883/node_modules/@postgrestools/cli-x86_64-linux-gnu/",\
+    ["@postgres-language-server/cli-x86_64-apple-darwin", [\
+      ["npm:0.17.2", {\
+        "packageLocation": "./.yarn/unplugged/@postgres-language-server-cli-x86_64-apple-darwin-npm-0.17.2-b8b3e1d2fc/node_modules/@postgres-language-server/cli-x86_64-apple-darwin/",\
         "packageDependencies": [\
-          ["@postgrestools/cli-x86_64-linux-gnu", "npm:0.2.0"]\
+          ["@postgres-language-server/cli-x86_64-apple-darwin", "npm:0.17.2"]\
         ],\
         "linkType": "HARD"\
       }]\
     ]],\
-    ["@postgrestools/cli-x86_64-windows-msvc", [\
-      ["npm:0.2.0", {\
-        "packageLocation": "./.yarn/unplugged/@postgrestools-cli-x86_64-windows-msvc-npm-0.2.0-003485c20e/node_modules/@postgrestools/cli-x86_64-windows-msvc/",\
+    ["@postgres-language-server/cli-x86_64-linux-gnu", [\
+      ["npm:0.17.2", {\
+        "packageLocation": "./.yarn/unplugged/@postgres-language-server-cli-x86_64-linux-gnu-npm-0.17.2-055696170c/node_modules/@postgres-language-server/cli-x86_64-linux-gnu/",\
         "packageDependencies": [\
-          ["@postgrestools/cli-x86_64-windows-msvc", "npm:0.2.0"]\
+          ["@postgres-language-server/cli-x86_64-linux-gnu", "npm:0.17.2"]\
         ],\
         "linkType": "HARD"\
       }]\
     ]],\
-    ["@postgrestools/postgrestools", [\
-      ["npm:0.2.0", {\
-        "packageLocation": "../../../../../.yarn/berry/cache/@postgrestools-postgrestools-npm-0.2.0-12e9de0275-10c0.zip/node_modules/@postgrestools/postgrestools/",\
+    ["@postgres-language-server/cli-x86_64-linux-musl", [\
+      ["npm:0.17.2", {\
+        "packageLocation": "./.yarn/unplugged/@postgres-language-server-cli-x86_64-linux-musl-npm-0.17.2-90a2bdbd89/node_modules/@postgres-language-server/cli-x86_64-linux-musl/",\
         "packageDependencies": [\
-          ["@postgrestools/postgrestools", "npm:0.2.0"],\
-          ["@postgrestools/cli-aarch64-apple-darwin", "npm:0.2.0"],\
-          ["@postgrestools/cli-aarch64-linux-gnu", "npm:0.2.0"],\
-          ["@postgrestools/cli-aarch64-windows-msvc", "npm:0.2.0"],\
-          ["@postgrestools/cli-x86_64-apple-darwin", "npm:0.2.0"],\
-          ["@postgrestools/cli-x86_64-linux-gnu", "npm:0.2.0"],\
-          ["@postgrestools/cli-x86_64-windows-msvc", "npm:0.2.0"]\
+          ["@postgres-language-server/cli-x86_64-linux-musl", "npm:0.17.2"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@postgres-language-server/cli-x86_64-windows-msvc", [\
+      ["npm:0.17.2", {\
+        "packageLocation": "./.yarn/unplugged/@postgres-language-server-cli-x86_64-windows-msvc-npm-0.17.2-b4a4670237/node_modules/@postgres-language-server/cli-x86_64-windows-msvc/",\
+        "packageDependencies": [\
+          ["@postgres-language-server/cli-x86_64-windows-msvc", "npm:0.17.2"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -106,7 +116,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./",\
         "packageDependencies": [\
           ["my-project", "workspace:."],\
-          ["@postgrestools/postgrestools", "npm:0.2.0"]\
+          ["@postgres-language-server/cli", "npm:0.17.2"]\
         ],\
         "linkType": "SOFT"\
       }]\

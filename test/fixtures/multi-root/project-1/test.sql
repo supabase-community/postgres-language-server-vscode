@@ -1,1 +1,1 @@
-select email from public.users;
+select emai from public.users;

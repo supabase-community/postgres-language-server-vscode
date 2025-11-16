@@ -21,15 +21,10 @@ import {
   type Project,
 } from "./project";
 import { state } from "./state";
-import {
-  daysToMs,
-  fileExists,
-  fileIsExecutable,
-  getVersion,
-  subtractURI,
-} from "./utils";
+import { daysToMs, fileExists, fileIsExecutable, getVersion } from "./utils";
 import { CONSTANTS, OperatingMode } from "./constants";
 import { getConfig, isEnabledForFolder } from "./config";
+import { hasNewName, updateAndRenamingMessageForKind } from "./renaming";
 
 export type Session = {
   bin: Uri;
@@ -51,9 +46,9 @@ export const createSession = async (
 
   if (!findResult) {
     window.showErrorMessage(
-      `Unable to find a PostgresTools binary. Read the docs for more various strategies to install a binary.`
+      `Unable to find a Postgres Language Server binary. Read the docs for various strategies to install a binary.`
     );
-    logger.error("Could not find the PostgresTools binary");
+    logger.error("Could not find the Postgres Language Server binary");
     return;
   }
 
@@ -66,10 +61,6 @@ export const createSession = async (
     return;
   }
 
-  logger.info("Copying binary to temp location", {
-    currentLocation: findResult.bin.fsPath,
-  });
-
   const version = await getVersion(findResult.bin);
   if (!version) {
     throw new Error(
@@ -81,14 +72,13 @@ export const createSession = async (
     state.context.globalState.get<string>("lastNotifiedOfUpdate") ||
     new Date(0).toISOString();
 
-  if (
-    state.releases.versionOutdated(version) &&
-    state.releases.latestVersion() &&
-    Date.now() - new Date(lastNotifiedOfUpdate).getTime() > daysToMs(3)
-  ) {
-    window.showInformationMessage(
-      `A new version of PostgresTools is available! your version ${version} is outdated, consider updating to latest version ${state.releases.latestVersion()}.`
-    );
+  if (Date.now() - new Date(lastNotifiedOfUpdate).getTime() > daysToMs(3)) {
+    if (state.releases.versionOutdated(version)) {
+      window.showInformationMessage(
+        updateAndRenamingMessageForKind(findResult.kind)
+      );
+    }
+
     await state.context.globalState.update(
       "lastNotifiedOfUpdate",
       new Date().toISOString()
@@ -100,9 +90,13 @@ export const createSession = async (
     !semver.gte(version, "0.8.0")
   ) {
     window.showInformationMessage(
-      `Your current PostgresTools version ${version} does not support multi-root workspaces. Consider upgrading to version >= 0.8.0.`
+      `Your current Postgres Language Server version ${version} does not support multi-root workspaces. Consider upgrading to version >= 0.8.0.`
     );
   }
+
+  logger.info("Copying binary to temp location", {
+    currentLocation: findResult.bin.fsPath,
+  });
 
   // Copy the binary to a temporary location, and run it from there
   // so that the original binary can be updated without locking issues.
@@ -156,10 +150,10 @@ const copyBinaryToTemporaryLocation = async (
 
   const location = Uri.joinPath(
     state.context.globalStorageUri,
-    "tmp-bin",
-    CONSTANTS.platformSpecificBinaryName.replace(
-      "postgrestools",
-      `postgrestools-${version}`
+    CONSTANTS.globalStorageFolderTmp,
+    CONSTANTS.newPlatformSpecificBinaryName.replace(
+      "postgres-language-server",
+      `postgres-language-server-${version}`
     )
   );
 
@@ -175,7 +169,7 @@ const copyBinaryToTemporaryLocation = async (
       });
       copyFileSync(bin.fsPath, location.fsPath);
       logger.debug(
-        "Copied postgrestools binary binary to temporary location.",
+        "Copied postgres language server binary binary to temporary location.",
         {
           original: bin.fsPath,
           temporary: location.fsPath,
@@ -183,7 +177,7 @@ const copyBinaryToTemporaryLocation = async (
       );
     } else {
       logger.debug(
-        `A postgrestools binary for the same version ${version} already exists in the temporary location.`,
+        `A postgres language server binary for the same version ${version} already exists in the temporary location.`,
         {
           original: bin.fsPath,
           temporary: location.fsPath,
@@ -214,7 +208,7 @@ export const createActiveSession = async () => {
 
   if (CONSTANTS.operatingMode === OperatingMode.SingleFile) {
     logger.warn(
-      "Single file mode unsupported, because we need a `postgrestools.jsonc` file."
+      "Single file mode unsupported, because we need a configuration file."
     );
     return;
   }
@@ -230,10 +224,10 @@ export const createActiveSession = async () => {
   try {
     if (state.activeSession) {
       await state.activeSession?.client.start();
-      logger.info("Created a postgrestools session");
+      logger.info("Created a postgres language server session");
     }
   } catch (e) {
-    logger.error("Failed to create postgrestools session", {
+    logger.error("Failed to create postgres language server session", {
       error: `${e}`,
     });
     state.activeSession?.client.dispose();
@@ -287,7 +281,7 @@ async function createActiveSessionForMultiRoot(): Promise<Session | undefined> {
 }
 
 /**
- * Creates a new PostgresTools LSP client
+ * Creates a new Postgres Language Server LSP client
  */
 const createLanguageClient = (bin: Uri, projects: Project[]) => {
   const singleRootProject = projects.length === 1 ? projects[0] : undefined;
@@ -326,9 +320,12 @@ const createLanguageClient = (bin: Uri, projects: Project[]) => {
     progressOnInitialization: true,
 
     initializationFailedHandler: (e): boolean => {
-      logger.error("Failed to initialize the PostgresTools language server", {
-        error: e.toString(),
-      });
+      logger.error(
+        "Failed to initialize the Postgres Language Server language server",
+        {
+          error: e.toString(),
+        }
+      );
 
       return false;
     },
@@ -338,7 +335,7 @@ const createLanguageClient = (bin: Uri, projects: Project[]) => {
         message,
         count
       ): ErrorHandlerResult | Promise<ErrorHandlerResult> => {
-        logger.error("PostgresTools language server error", {
+        logger.error("Postgres Language Server language server error", {
           error: error.toString(),
           stack: error.stack,
           errorMessage: error.message,
@@ -348,14 +345,14 @@ const createLanguageClient = (bin: Uri, projects: Project[]) => {
 
         return {
           action: ErrorAction.Shutdown,
-          message: "PostgresTools language server error",
+          message: "Postgres Language Server language server error",
         };
       },
       closed: (): CloseHandlerResult | Promise<CloseHandlerResult> => {
-        logger.error("PostgresTools language server closed");
+        logger.error("Postgres Language Server language server closed");
         return {
           action: CloseAction.DoNotRestart,
-          message: "PostgresTools language server closed",
+          message: "Postgres Language Server language server closed",
         };
       },
     },
@@ -366,16 +363,16 @@ const createLanguageClient = (bin: Uri, projects: Project[]) => {
     workspaceFolder: undefined,
   };
 
-  return new PostgresToolsLanguageClient(
-    "postgrestools.lsp",
-    "postgrestools",
+  return new PostgresLanguageServerLanguageClient(
+    "postgres-language-server.lsp",
+    "postgres-language-server",
     serverOptions,
     clientOptions
   );
 };
 
 /**
- * Creates a new PostgresTools LSP logger
+ * Creates a new Postgres Language Server LSP logger
  */
 const createLspLogger = (): LogOutputChannel => {
   return window.createOutputChannel(
@@ -387,7 +384,7 @@ const createLspLogger = (): LogOutputChannel => {
 };
 
 /**
- * Creates a new PostgresTools LSP logger
+ * Creates a new Postgres Language Server LSP logger
  */
 const createLspTraceLogger = (): LogOutputChannel => {
   // If the project is missing, we're creating a logger for the global LSP
@@ -415,7 +412,7 @@ const createDocumentSelector = (projects: Project[]): DocumentFilter[] => {
   });
 };
 
-class PostgresToolsLanguageClient extends LanguageClient {
+class PostgresLanguageServerLanguageClient extends LanguageClient {
   protected fillInitializeParams(params: InitializeParams): void {
     super.fillInitializeParams(params);
 
