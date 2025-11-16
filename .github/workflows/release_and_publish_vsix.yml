@@ -31,7 +31,7 @@ jobs:
         id: find_vsix
         run: |
           VERSION="${{ steps.get_version.outputs.version }}"
-          VSIX_FILE="postgrestools-$VERSION.vsix"
+          VSIX_FILE="postgres-language-server-$VERSION.vsix"
           if [ !-f "$VSIX_FILE" ]; then 
             echo "VSIX file $VSIX_FILE not found!"
             exit 1 
@@ -44,7 +44,7 @@ jobs:
           tag_name: "v${{ steps.get_version.outputs.version }}"
           name: "v${{ steps.get_version.outputs.version }}"
           draft: true
-          body: "Postgrestools Extension version v${{ steps.get_version.outputs.version }} has been released! 🚀"
+          body: "Postgres Language Server Extension version v${{ steps.get_version.outputs.version }} has been released! 🚀"
           files: "${{ steps.find_vsix.outputs.vsix_file }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
