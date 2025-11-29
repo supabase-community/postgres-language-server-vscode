@@ -3,7 +3,7 @@
   "publisher": "Supabase",
   "displayName": "postgres-language-server",
   "description": "Postgres Language Server right in your IDE.",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "repository": {
     "type": "git",
     "url": "https://github.com/supabase-community/postgres-language-server-vscode"
