@@ -13,7 +13,7 @@
   },
   "engines": {
     "vscode": "^1.105.1",
-    "node": ">=19.2.0"
+    "node": ">=20"
   },
   "icon": "icon.png",
   "categories": [
@@ -167,27 +167,24 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
-    "package": "vsce package",
-    "publish": "vsce package -o extension.vsix && vsce publish --packagePath extension.vsix && ovsx publish --packagePath extension.vsix"
+    "package": "vsce package --no-dependencies -o extension.vsix",
+    "publish": "pnpm run package && vsce publish --packagePath extension.vsix && ovsx publish --packagePath extension.vsix"
   },
   "devDependencies": {
-    "@types/node": "20.17.23",
+    "@types/node": "24.10.1",
     "@types/semver": "7.7.0",
     "@types/vscode": "^1.96.2",
     "@typescript-eslint/eslint-plugin": "^8.22.0",
     "@typescript-eslint/parser": "^8.22.0",
-    "@vscode/vsce": "3.5.0",
+    "@vscode/vsce": "3.7.1",
     "eslint": "^9.19.0",
-    "ovsx": "0.10.5",
+    "ovsx": "0.10.7",
     "typescript": "^5.7.3"
   },
   "dependencies": {
-    "semver": "7.7.2",
+    "semver": "7.7.3",
     "vscode-languageclient": "9.0.1",
     "vscode-uri": "3.1.0"
   },
