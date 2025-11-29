@@ -15,6 +15,9 @@ jobs:
         with:
           node-version-file: package.json
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Get version from package.json
         id: get_version
         run: |
@@ -22,10 +25,13 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install
 
       - name: Build VSIX package
-        run: npm run package
+        run: pnpm run package
+
+      - name: Rename extension file
+        run: "mv extension.vsix postgres-language-server-${{ steps.get_version.outputs.version }}.vsix"
 
       - name: Find VSIX file
         id: find_vsix
