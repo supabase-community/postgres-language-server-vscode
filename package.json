@@ -169,7 +169,8 @@
   "scripts": {
     "watch": "tsc -watch -p ./",
     "lint": "eslint src",
-    "package": "vsce package --no-dependencies -o extension.vsix",
+    "compile": "tsc -p ./",
+    "package": "pnpm run compile && vsce package --no-dependencies -o extension.vsix",
     "publish:vscode": "vsce publish --packagePath extension.vsix",
     "publish:ovsx": "ovsx publish --packagePath extension.vsix"
   },
@@ -182,7 +183,7 @@
     "@vscode/vsce": "3.7.1",
     "eslint": "^9.19.0",
     "ovsx": "0.10.7",
-    "typescript": "^5.7.3"
+    "typescript": "5.9.3"
   },
   "dependencies": {
     "semver": "7.7.3",
