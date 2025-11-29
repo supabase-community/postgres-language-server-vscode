@@ -170,7 +170,8 @@
     "watch": "tsc -watch -p ./",
     "lint": "eslint src",
     "package": "vsce package --no-dependencies -o extension.vsix",
-    "publish": "pnpm run package && vsce publish --packagePath extension.vsix && ovsx publish --packagePath extension.vsix"
+    "publish:vscode": "vsce publish --packagePath extension.vsix",
+    "publish:ovsx": "ovsx publish --packagePath extension.vsix"
   },
   "devDependencies": {
     "@types/node": "24.10.1",
