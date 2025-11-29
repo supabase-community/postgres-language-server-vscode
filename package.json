@@ -12,8 +12,8 @@
     "url": "https://github.com/supabase-community/postgres-language-server"
   },
   "engines": {
-    "vscode": "^1.96.2",
-    "node": "^18"
+    "vscode": "^1.105.1",
+    "node": ">=19.2.0"
   },
   "icon": "icon.png",
   "categories": [
