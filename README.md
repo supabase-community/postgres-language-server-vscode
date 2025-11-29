@@ -21,7 +21,7 @@ The [Language Server Protocol](https://microsoft.github.io/language-server-proto
 
 ## Setting Up Your Project
 
-**Second**, you need a `postgres-language-server.jsonc` file at the root of your repository (or, use a custom file location and point to it via the `postgres-language-server.configFile` setting). You can find sane defaults in the [docs](https://pgtools.dev/#configuration).
+**Second**, you need a `postgres-language-server.jsonc` file at the root of your repository (or, use a custom file location and point to it via the `postgres-language-server.configFile` setting). You can find sane defaults in the [docs](https://pg-language-server.com/latest/configuration/).
 
 When you specify the `db` section, the LSP server will connect to your database and gather intel from there. This makes it possible to provide autocompletions and type checks.
 
