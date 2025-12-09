@@ -170,7 +170,7 @@
     "watch": "tsc -watch -p ./",
     "lint": "eslint src",
     "compile": "tsc -p ./",
-    "package": "pnpm run compile && vsce package --no-dependencies -o extension.vsix",
+    "package": "npm run compile && vsce package -o extension.vsix",
     "publish:vscode": "vsce publish --packagePath extension.vsix",
     "publish:ovsx": "ovsx publish --packagePath extension.vsix"
   },
@@ -189,6 +189,5 @@
     "semver": "7.7.3",
     "vscode-languageclient": "9.0.1",
     "vscode-uri": "3.1.0"
-  },
-  "packageManager": "pnpm@10.22.0+sha512.bf049efe995b28f527fd2b41ae0474ce29186f7edcb3bf545087bd61fbbebb2bf75362d1307fda09c2d288e1e499787ac12d4fcb617a974718a6051f2eee741c"
+  }
 }
