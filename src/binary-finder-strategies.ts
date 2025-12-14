@@ -2,7 +2,7 @@ import { Uri, window } from "vscode";
 import { logger } from "./logger";
 import { delimiter, dirname, join } from "node:path";
 import { CONSTANTS, OperatingMode } from "./constants";
-import { fileExists } from "./utils";
+import { expandEnvVariables, fileExists } from "./utils";
 import { createRequire } from "node:module";
 import { getConfig } from "./config";
 import { downloadPglt, getDownloadedBinary } from "./downloader";
@@ -70,6 +70,8 @@ export const vsCodeSettingsStrategy: BinaryFindStrategy = {
 
     if (typeof binSetting === "string") {
       logger.debug("Binary Setting is a string", { binSetting });
+
+      binSetting = expandEnvVariables(binSetting);
 
       let resolvedPath: string;
 
