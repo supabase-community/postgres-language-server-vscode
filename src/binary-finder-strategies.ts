@@ -12,6 +12,17 @@ export interface BinaryFindStrategy {
   find(path?: Uri): Promise<Uri | null>;
 }
 
+function expandEnvVariables(path: string): string {
+  return path.replace(/\$\{env:([^}]+)\}/g, (match, varName) => {
+    const value = process.env[varName];
+    if (value === undefined || value === "") {
+      logger.warn(`Environment variable '${varName}' is not set`);
+      return match;
+    }
+    return value;
+  });
+}
+
 /**
  * The user can specify a Postgres Language Server binary in the VSCode settings.
  *
@@ -70,6 +81,8 @@ export const vsCodeSettingsStrategy: BinaryFindStrategy = {
 
     if (typeof binSetting === "string") {
       logger.debug("Binary Setting is a string", { binSetting });
+
+      binSetting = expandEnvVariables(binSetting);
 
       let resolvedPath: string;
 
