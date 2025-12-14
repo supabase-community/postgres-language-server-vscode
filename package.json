@@ -136,7 +136,11 @@
         },
         "postgres-language-server.configFile": {
           "type": "string",
-          "description": "Path to the `postgres-language-server.jsonc` file. You don't need to set this if the file is on root level of your project.",
+          "description": "Path to the `postgres-language-server.jsonc` file. Supports environment variables with ${env:VAR_NAME} syntax. You don't need to set this if the file is on root level of your project.",
+          "examples": [
+            "./configs/postgres-language-server.jsonc",
+            "${env:POSTGRES_CONFIG_DIR}/postgres-language-server.jsonc"
+          ],
           "scope": "resource"
         },
         "postgres-language-server.bin": {

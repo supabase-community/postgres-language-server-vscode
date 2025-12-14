@@ -133,3 +133,14 @@ export async function getVersion(bin: Uri): Promise<string | null> {
 export function daysToMs(days: number) {
   return days * 24 * 60 * 60 * 1000;
 }
+
+export function expandEnvVariables(path: string): string {
+  return path.replace(/\$\{env:([^}]+)\}/g, (match, varName) => {
+    const value = process.env[varName];
+    if (value === undefined || value === "") {
+      logger.warn(`Environment variable '${varName}' is not set`);
+      return match;
+    }
+    return value;
+  });
+}

@@ -1,5 +1,5 @@
 import { Uri, window, type WorkspaceFolder } from "vscode";
-import { fileExists } from "./utils";
+import { expandEnvVariables, fileExists } from "./utils";
 import { getConfig, isEnabledForFolder } from "./config";
 import { logger } from "./logger";
 import { state } from "./state";
@@ -16,7 +16,11 @@ export async function getActiveProjectsForMultiRoot(
   let globalConfig: Uri | undefined = undefined;
 
   if (!globalConfig) {
-    const globalConfigSetting = getConfig<string>("configFile");
+    let globalConfigSetting = getConfig<string>("configFile");
+
+    if (globalConfigSetting) {
+      globalConfigSetting = expandEnvVariables(globalConfigSetting);
+    }
 
     if (globalConfigSetting && globalConfigSetting.startsWith(".")) {
       window.showErrorMessage(
@@ -90,12 +94,17 @@ export async function getActiveProjectForSingleRoot(
 ): Promise<Project | null> {
   let configPath: Uri;
 
-  const userConfig = getConfig<string>("configFile", { scope: first.uri });
+  let userConfig = getConfig<string>("configFile", { scope: first.uri });
   if (userConfig) {
+    userConfig = expandEnvVariables(userConfig);
     logger.info("User has specified path to config file.", {
       path: userConfig,
     });
-    configPath = Uri.joinPath(first.uri, userConfig);
+    if (userConfig.startsWith(".")) {
+      configPath = Uri.joinPath(first.uri, userConfig);
+    } else {
+      configPath = Uri.file(userConfig);
+    }
   } else {
     logger.info("User did not specify path to config file. Using default.");
 

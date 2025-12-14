@@ -2,7 +2,7 @@ import { Uri, window } from "vscode";
 import { logger } from "./logger";
 import { delimiter, dirname, join } from "node:path";
 import { CONSTANTS, OperatingMode } from "./constants";
-import { fileExists } from "./utils";
+import { expandEnvVariables, fileExists } from "./utils";
 import { createRequire } from "node:module";
 import { getConfig } from "./config";
 import { downloadPglt, getDownloadedBinary } from "./downloader";
@@ -10,17 +10,6 @@ import { downloadPglt, getDownloadedBinary } from "./downloader";
 export interface BinaryFindStrategy {
   name: string;
   find(path?: Uri): Promise<Uri | null>;
-}
-
-function expandEnvVariables(path: string): string {
-  return path.replace(/\$\{env:([^}]+)\}/g, (match, varName) => {
-    const value = process.env[varName];
-    if (value === undefined || value === "") {
-      logger.warn(`Environment variable '${varName}' is not set`);
-      return match;
-    }
-    return value;
-  });
 }
 
 /**
