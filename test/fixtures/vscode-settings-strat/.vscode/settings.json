@@ -1,4 +1,4 @@
 {
-  "postgres-language-server.configFile": "./configs/conf.jsonc",
+  "postgres-language-server.configFile": "${env:POSTGRESTOOLS_DIR}/test/fixtures/vscode-settings-strat/configs/conf.jsonc",
   "postgres-language-server.bin": "${env:POSTGRESTOOLS_DIR}/test/fixtures/vscode-settings-strat/bin/postgrestools"
 }
