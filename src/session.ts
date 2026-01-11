@@ -351,8 +351,8 @@ const createLanguageClient = (bin: Uri, projects: Project[]) => {
       closed: (): CloseHandlerResult | Promise<CloseHandlerResult> => {
         logger.error("Postgres Language Server language server closed");
         return {
-          action: CloseAction.DoNotRestart,
-          message: "Postgres Language Server language server closed",
+          action: CloseAction.Restart,
+          message: "Postgres Language Server language server is restarting",
         };
       },
     },
