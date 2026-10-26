@@ -49,6 +49,16 @@ You can also run the LSP server against your remote database, but this might lea
 
 You should find your remote database settings at `https://supabase.com/dashboard/project/<yourProjectId>/settings/database?showConnect=true`.
 
+## Executing Statements
+
+If you allow it in your `postgres-language-server.jsonc` via `db.allowStatementExecutionsAgainst` (e.g. `["127.0.0.1:5432/*"]`), the code actions on a statement include `Execute Statement`. The extension shows the result in a `Statement Result` panel beside the editor:
+
+- For a query, the returned rows as a table. The server sends at most 100 rows; if the statement returned more, the panel says so. `NULL` values are shown as `NULL`.
+- For any other statement, the number of affected rows.
+- If Postgres rejects the statement, its error message, SQLSTATE, detail, and hint. Click the position to jump to the error in the document.
+
+The panel needs a server that returns the result of the statement. With older servers, you only get the short summary message.
+
 ## Useful Commands
 
 The extension adds seven commands to your VS Code Command Palette. They are all prefixed by `Postgres Language Server`.

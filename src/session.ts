@@ -25,6 +25,7 @@ import { daysToMs, fileExists, fileIsExecutable, getVersion } from "./utils";
 import { CONSTANTS, OperatingMode } from "./constants";
 import { getConfig, isEnabledForFolder } from "./config";
 import { hasNewName, updateAndRenamingMessageForKind } from "./renaming";
+import { executeCommand } from "./statement-execution";
 
 export type Session = {
   bin: Uri;
@@ -318,6 +319,9 @@ const createLanguageClient = (bin: Uri, projects: Project[]) => {
     traceOutputChannel: createLspTraceLogger(),
     documentSelector: createDocumentSelector(projects),
     progressOnInitialization: true,
+    middleware: {
+      executeCommand,
+    },
 
     initializationFailedHandler: (e): boolean => {
       logger.error(
