@@ -62,8 +62,20 @@
       {
         "title": "Postgres Language Server: Copy Latest Server Logfile",
         "command": "postgres-language-server.copyLatestLogfile"
+      },
+      {
+        "title": "Postgres Language Server: Cancel Statement Execution",
+        "command": "postgres-language-server.cancelStatementExecution"
       }
     ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "postgres-language-server.cancelStatementExecution",
+          "when": "postgres-language-server.statementExecutionRunning"
+        }
+      ]
+    },
     "configuration": {
       "title": "Postgres Language Server",
       "properties": {
