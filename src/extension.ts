@@ -5,6 +5,7 @@ import {
   workspace,
 } from "vscode";
 import { UserFacingCommands } from "./commands";
+import { cancelStatementExecutions } from "./statement-execution";
 import { restart, start, stop } from "./lifecycle";
 import { logger } from "./logger";
 import { state } from "./state";
@@ -60,6 +61,10 @@ const registerUserFacingCommands = () => {
     commands.registerCommand(
       "postgres-language-server.copyLatestLogfile",
       UserFacingCommands.copyLatestLogfile
+    ),
+    commands.registerCommand(
+      "postgres-language-server.cancelStatementExecution",
+      cancelStatementExecutions
     )
   );
 

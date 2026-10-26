@@ -51,9 +51,16 @@ export type ResultView = {
   /** How long the request took, in milliseconds. */
   durationMs?: number;
 } & (
-  | { kind: "result"; result: ExecuteStatementResult }
+  | {
+      kind: "result";
+      result: ExecuteStatementResult;
+      /** Whether the user cancelled the execution, but the server still sent the result. */
+      finishedDespiteCancellation?: boolean;
+    }
   /** The request failed, e.g. because the database is not reachable. */
   | { kind: "failure"; message: string }
+  /** The user cancelled the execution and the server confirmed it. */
+  | { kind: "cancelled" }
 );
 
 /**
@@ -169,8 +176,19 @@ const renderBody = (view: ResultView): string => {
   </div>`;
   }
 
+  if (view.kind === "cancelled") {
+    return `<div class="summary">Execution cancelled${duration}</div>
+  <div class="muted">A language server that can't cancel statements in the database may still have run it.</div>`;
+  }
+
   const { result } = view;
   const parts: string[] = [];
+
+  if (view.finishedDespiteCancellation) {
+    parts.push(
+      `<div class="note">The statement finished before it could be cancelled.</div>`
+    );
+  }
 
   if (result.error) {
     parts.push(renderError(result.error, duration));

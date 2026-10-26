@@ -25,7 +25,7 @@ import { daysToMs, fileExists, fileIsExecutable, getVersion } from "./utils";
 import { CONSTANTS, OperatingMode } from "./constants";
 import { getConfig, isEnabledForFolder } from "./config";
 import { hasNewName, updateAndRenamingMessageForKind } from "./renaming";
-import { executeCommand } from "./statement-execution";
+import { createExecuteCommandMiddleware } from "./statement-execution";
 
 export type Session = {
   bin: Uri;
@@ -314,13 +314,16 @@ const createLanguageClient = (bin: Uri, projects: Project[]) => {
     serverOptions,
   });
 
+  // The middleware sends requests itself, so it needs the client that it belongs to.
+  let client: LanguageClient | undefined;
+
   const clientOptions: LanguageClientOptions = {
     outputChannel: createLspLogger(),
     traceOutputChannel: createLspTraceLogger(),
     documentSelector: createDocumentSelector(projects),
     progressOnInitialization: true,
     middleware: {
-      executeCommand,
+      executeCommand: createExecuteCommandMiddleware(() => client),
     },
 
     initializationFailedHandler: (e): boolean => {
@@ -367,12 +370,13 @@ const createLanguageClient = (bin: Uri, projects: Project[]) => {
     workspaceFolder: undefined,
   };
 
-  return new PostgresLanguageServerLanguageClient(
+  client = new PostgresLanguageServerLanguageClient(
     "postgres-language-server.lsp",
     "postgres-language-server",
     serverOptions,
     clientOptions
   );
+  return client;
 };
 
 /**

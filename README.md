@@ -59,9 +59,11 @@ If you allow it in your `postgres-language-server.jsonc` via `db.allowStatementE
 
 The panel needs a server that returns the result of the statement. With older servers, you only get the short summary message.
 
+While a statement runs, a notification shows it with a `Cancel` button, and the `Postgres Language Server: Cancel Statement Execution` command is available. Both ask the server to cancel the statement. Servers that support it stop the statement in the database. Older servers can't: the statement runs to completion, and the panel shows its result with a note that it finished before it could be cancelled.
+
 ## Useful Commands
 
-The extension adds seven commands to your VS Code Command Palette. They are all prefixed by `Postgres Language Server`.
+The extension adds eight commands to your VS Code Command Palette. They are all prefixed by `Postgres Language Server`.
 
 - `Postgres Language Server: Hard Reset (Delete All Temp and Global Binaries)` is your troubleshooting weapon. It will basically remove all binaries that were copied and downloaded _by the extension_ (not those you have installed or copied yourself). The extension will then again search for a server binary via the strategies mentioned in [the setup](#setting-up-the-lsp-server).
 - `Postgres Language Server: Download Server` lets you select and download the server binary. It'll be the matching version for your machine. If you set `postgres-language-server.allowDownloadPrereleases` to true in yor VS Code settings, you'll be able to select prereleases.
@@ -69,6 +71,7 @@ The extension adds seven commands to your VS Code Command Palette. They are all 
 - `Postgres Language Server: Start` and `Postgres Language Server: Stop` will stop or start the LSP server and the client.
 - `Postgres Language Server: Restart` runs stop and start in succession.
 - `Postgres Language Server: Copy Latest Server Logfile` copies the latest server log file to your currently opened repo. The log file is meant to be attached to GitHub issues, it can sometimes help us to debug.
+- `Postgres Language Server: Cancel Statement Execution` cancels the statements that are executing. It only shows up in the Command Palette while a statement runs.
 
 ## Multi-Root Workspaces
 
